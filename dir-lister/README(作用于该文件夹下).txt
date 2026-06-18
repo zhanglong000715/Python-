@@ -9,3 +9,6 @@ test_1:
 The core functionality is to collect all file names and subfolder names within the script's current directory (excluding any files inside those subfolders). It then creates a custom-named .txt file in the same directory and writes all the collected data into it.
 test_3:
 Building upon test_1, this script utilizes a recursive function to upgrade and override the original core functionality. test_3 collects all file names within the script's current directory, including all files nested in subdirectories, while strictly excluding all folder names.
+
+使用须知：
+    请在保证拥有权限的情况下运行脚本，否则会出现拒绝访问的报错.
