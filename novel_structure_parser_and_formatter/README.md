@@ -45,7 +45,7 @@
 
 ### 使用方法
 1. 确保已安装 Python 3.x 环境。
-2. 在终端中运行脚本：`python novel_auto_formatter.py`
+2. 在终端中运行脚本：`novel_structure_parser_and_formatter.py`
 3. 根据提示输入小说文件所在的目录路径和文件名。
 4. 运行结束后，在原目录下即可找到生成的 `_parsed.json` 和 `_formatted.txt` 文件。
 
