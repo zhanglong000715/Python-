@@ -22,7 +22,7 @@
 
 ### How to Use
 1. Ensure you have Python 3.x installed.
-2. Run the script in your terminal: `python novel_auto_formatter.py`
+2. Run the script in your terminal: `novel_structure_parser_and_formatter.py`
 3. Follow the prompts to input the directory path and the novel's filename.
 4. Find the generated `_parsed.json` and `_formatted.txt` files in the same directory.
 
@@ -68,7 +68,7 @@
 
 ### 使い方
 1. Python 3.x がインストールされていることを確認してください。
-2. ターミナルでスクリプトを実行します：`python novel_auto_formatter.py`
+2. ターミナルでスクリプトを実行します：`novel_structure_parser_and_formatter.py`
 3. プロンプトに従って、ディレクトリパスと小説のファイル名を入力します。
 4. 実行後、同じディレクトリ内に生成された `_parsed.json` と `_formatted.txt` ファイルを確認できます。
 
