@@ -68,7 +68,7 @@ def write_to_txt(items):
             # 拼接出当前遍历项目的完整绝对路径，用于后续判断它是文件还是文件夹
             item_path = os.path.join(os.getcwd(), item)
 
-            # os.path.isfile() 怕毛短该路径是否是一个文件
+            # os.path.isfile() 判断该路径是否是一个文件
             # split切分用与获取目录下需要的部分(文件名)
             if os.path.isfile(item_path):
                 item = item.split("/")[-1]
