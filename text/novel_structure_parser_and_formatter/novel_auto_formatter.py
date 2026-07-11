@@ -1,14 +1,14 @@
 # ==============================================================================
 # 【脚本功能介绍 / スクリプト機能紹介 / Script Introduction】
 #
-# 中文：
+# 中文 : 
 #   本脚本是一个纯标准库实现的小说自动排版工具。
 #   它能够自动识别小说文件中的"卷"和"章"结构，提取书名、作者、内容简介等元数据，
 #   并对正文内容进行智能换行排版(基于标点符号断句)，最终输出结构化的 JSON 文件
 #   和排版美观的 TXT 文件。支持 UTF-8、GBK、GB18030、UTF-16 多种编码自动检测。
 #   无需安装任何第三方依赖，开箱即用。
 #
-# 日本語：
+# 日本語 : 
 #   このスクリプトは、標準ライブラリのみで実装された小説自動レイアウトツールです。
 #   小説ファイル内の「巻」と「章」の構造を自動的に識別し、書名・著者・内容紹介などの
 #   メタデータを抽出します。本文コンテンツに対しては、句読点に基づくインテリジェントな
@@ -172,20 +172,20 @@ def clean_header_and_meta(text):
     # Create an empty dictionary to store the extracted metadata
     meta = {}
 
-    # 匹配 名称/书名：使用正则表达式查找"名称"或"书名"后面的内容
-    # 名称/書名をマッチ：正規表現で「名称」または「書名」の後の内容を探す
+    # 匹配 名称/书名 : 使用正则表达式查找"名称"或"书名"后面的内容
+    # 名称/書名をマッチ : 正規表現で「名称」または「書名」の後の内容を探す
     # Match title/book name: use regex to find content after "名称" (name) or "书名" (book name)
-    name_match = re.search(r'(?:名称|书名)[/：:\s]+([^\n]+)', clean_text)
+    name_match = re.search(r'(?:名称|书名)[/ : :\s]+([^\n]+)', clean_text)
 
     # 如果匹配成功则提取第一组内容并去除首尾空格，否则使用默认值
     # マッチ成功なら第1グループの内容を抽出して前後の空白を除去、失敗ならデフォルト値を使用
     # If matched, extract group 1 and strip whitespace; otherwise use a default value
     meta['名称'] = name_match.group(1).strip() if name_match else "未知名称"
 
-    # 匹配 作者：使用正则表达式查找"作者"或"原作者"后面的内容
-    # 著者をマッチ：正規表現で「作者」または「原作者」の後の内容を探す
+    # 匹配 作者 : 使用正则表达式查找"作者"或"原作者"后面的内容
+    # 著者をマッチ : 正規表現で「作者」または「原作者」の後の内容を探す
     # Match author: use regex to find content after "作者" (author) or "原作者" (original author)
-    author_match = re.search(r'(?:作者|原作者)[/：:\s]+([^\n]+)', clean_text)
+    author_match = re.search(r'(?:作者|原作者)[/ : :\s]+([^\n]+)', clean_text)
 
     # 如果匹配成功则提取作者名，否则使用默认值
     # マッチ成功なら著者名を抽出、失敗ならデフォルト値を使用
@@ -195,7 +195,7 @@ def clean_header_and_meta(text):
     # 匹配 内容简介(可能是多行，直到遇到第一个"第X卷/章"或连续空行或文本末尾)
     # 内容紹介をマッチ(複数行の可能性あり、最初の「第X巻/章」または連続空行またはテキスト末尾まで)
     # Match synopsis (may be multi-line, until the first "Volume/Chapter X", consecutive blank lines, or end of text)
-    intro_pattern = r'(?:内容简介|简介|内容)[/：:\s]+([\s\S]*?)(?=\n第[零一二三四五六七八九十百千万\d]+[卷章]|\n\n|\Z)'
+    intro_pattern = r'(?:内容简介|简介|内容)[/ : :\s]+([\s\S]*?)(?=\n第[零一二三四五六七八九十百千万\d]+[卷章]|\n\n|\Z)'
 
     # 使用正则表达式搜索简介内容
     # 正規表現で内容紹介を検索
@@ -227,8 +227,8 @@ def parse_novel_structure(text):
     Parse volumes and chapters, building a multi-level nested dictionary.
     Uses finditer to get title indices and string slicing to extract content, ensuring 100% content integrity.
     """
-    # 编译正则表达式：匹配"第X卷"或"第X章"格式的标题行
-    # 正規表現をコンパイル：「第X巻」または「第X章」形式のタイトル行にマッチ
+    # 编译正则表达式 : 匹配"第X卷"或"第X章"格式的标题行
+    # 正規表現をコンパイル : 「第X巻」または「第X章」形式のタイトル行にマッチ
     # Compile regex: match title lines in the format "第X卷" (Volume X) or "第X章" (Chapter X)
     # 其中数字部分支持中文数字和阿拉伯数字，^和MULTILINE确保匹配行首
     # 数字部分は中国語数字とアラビア数字をサポート、^とMULTILINEで行頭マッチを保証
@@ -397,8 +397,8 @@ def wrap_text_content(content, max_len):
         # 現在の行が長すぎる場合、折り返し処理が必要
         # If the current line is too long, it needs wrapping
         else:
-            # 超长行进行折行处理：循环直到剩余部分不再超长
-            # 長すぎる行の折り返し処理：残り部分が制限を超えなくなるまでループ
+            # 超长行进行折行处理 : 循环直到剩余部分不再超长
+            # 長すぎる行の折り返し処理 : 残り部分が制限を超えなくなるまでループ
             # Wrapping for overly long lines: loop until the remaining part is within the limit
             while len(line) > max_len:
                 # 初始切割位置设为最大长度
@@ -408,7 +408,7 @@ def wrap_text_content(content, max_len):
                 # 定义中英文标点符号集合，用于寻找合适的断句位置
                 # 中国語と英語の句読点集合を定義、適切な改行位置を探すために使用
                 # Define a set of Chinese and English punctuation marks for finding suitable break points
-                punctuations = "，。！？；：、,.!?;:""'】)"
+                punctuations = "，。！？； : 、,.!?;:""'】)"
                 # 从最大长度位置向前搜索(最多回退10个字符)，寻找标点符号
                 # 最大長の位置から前方に検索(最大10文字まで戻す)、句読点を探す
                 # Search backwards from the max length position (up to 10 characters) for punctuation
@@ -509,18 +509,18 @@ def save_outputs(final_dict, directory, base_name):
         # 写入作者信息行
         # 著者情報行を書き込む
         # Write the author information line
-        f.write(f"作者：{final_dict['作者']}\n")
+        f.write(f"作者 : {final_dict['作者']}\n")
         # 写入内容简介标题和内容
         # 内容紹介のタイトルと内容を書き込む
         # Write the synopsis title and content
-        f.write(f"内容简介：\n{final_dict['内容简介']}\n\n")
+        f.write(f"内容简介 : \n{final_dict['内容简介']}\n\n")
         # 写入一条由50个等号组成的分隔线
         # 50個の等号からなる区切り線を書き込む
         # Write a separator line consisting of 50 equal signs
         f.write("=" * 50 + "\n\n")
 
-        # 写入正文：遍历每一卷及其包含的章节
-        # 本文を書き込む：各巻とその章を走査
+        # 写入正文 : 遍历每一卷及其包含的章节
+        # 本文を書き込む : 各巻とその章を走査
         # Write the body: iterate over each volume and its chapters
         for vol, chapters in final_dict['正文'].items():
             # 写入卷标题，用等号和方括号装饰
@@ -664,14 +664,14 @@ def main():
     # 全タスク完了のヒント情報を出力
     # Print a message indicating all tasks are complete
     print("\n[完成] 所有任务执行完毕！")
-    # 打印统计信息：共解析出多少卷、多少章
-    # 統計情報を出力：合計何巻、何章を解析したか
+    # 打印统计信息 : 共解析出多少卷、多少章
+    # 統計情報を出力 : 合計何巻、何章を解析したか
     # Print statistics: how many volumes and chapters were parsed in total
     print(f"共解析出 {len(novel_structure)} 卷，总计 {sum(len(chaps) for chaps in novel_structure.values())} 章。")
 
 
-# Python 标准入口检查：仅在脚本被直接运行时执行 main()
-# Python標準エントリチェック：スクリプトが直接実行された場合のみmain()を実行
+# Python 标准入口检查 : 仅在脚本被直接运行时执行 main()
+# Python標準エントリチェック : スクリプトが直接実行された場合のみmain()を実行
 # Python standard entry check: only execute main() when the script is run directly
 if __name__ == "__main__":
     # 调用主函数，启动程序
