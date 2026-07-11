@@ -11,41 +11,41 @@ Author: Zhang Long
 著者: 張龍 (Zhang Long)
 ================================================================================
 脚本介绍: / Introduction: / スクリプト紹介:
-本脚本是一个基于 Python 编写的高级 FFmpeg 媒体合并工具。
-其核心创新点在于摒弃了传统仅依赖文件扩展名来判断媒体类型的做法,转而通过调用 ffprobe对文件内部的实际流 ( 视频流、音频流、字幕流) 进行深度检测与解析。
-这使得工具能够精准识别诸如"包含纯音频的 .webm 文件"或"包含字幕流的 .mkv 文件"等复杂情况,从而实现无损、高效的媒体封装。
+本脚本是一个基于 Python 编写的高级 FFmpeg 媒体合并工具.
+其核心创新点在于摒弃了传统仅依赖文件扩展名来判断媒体类型的做法,转而通过调用 ffprobe对文件内部的实际流 ( 视频流、音频流、字幕流) 进行深度检测与解析.
+这使得工具能够精准识别诸如"包含纯音频的 .webm 文件"或"包含字幕流的 .mkv 文件"等复杂情况,从而实现无损、高效的媒体封装.
 
 This script is an advanced FFmpeg media merging tool written in Python.
 Its core innovation lies in abandoning the traditional method of relying solely on file extensions to determine media types. Instead, it calls ffprobe to deeply detect and parse the actual streams (video, audio, subtitle) inside the file.
 This allows the tool to accurately identify complex cases such as ".webm files containing pure audio" or ".mkv files containing subtitle streams", thereby achieving lossless and efficient media muxing.
 
-本スクリプトはPythonで記述された高度なFFmpegメディア結合ツールです。
-その中核となるイノベーションは、メディアタイプを判断するためにファイル拡張子だけに依存する従来の方法を廃止し、代わりにffprobeを呼び出してファイル内部の実際のストリーム ( ビデオ、オーディオ、字幕) を深く検出・解析する点にあります。
-これにより、「純粋なオーディオを含む.webmファイル」や「字幕ストリームを含む.mkvファイル」といった複雑なケースを正確に識別し、無劣化かつ効率的なメディア多重化を実現します。
+本スクリプトはPythonで記述された高度なFFmpegメディア結合ツールです.
+その中核となるイノベーションは、メディアタイプを判断するためにファイル拡張子だけに依存する従来の方法を廃止し、代わりにffprobeを呼び出してファイル内部の実際のストリーム ( ビデオ、オーディオ、字幕) を深く検出・解析する点にあります.
+これにより、「純粋なオーディオを含む.webmファイル」や「字幕ストリームを含む.mkvファイル」といった複雑なケースを正確に識別し、無劣化かつ効率的なメディア多重化を実現します.
 
 主要功能包括 : 
 Main features include:
 主な機能は以下の通りです : 
 
-1. 智能流检测 : 利用 ffprobe 获取真实的 codec_type,确保分类准确无误。
+1. 智能流检测 : 利用 ffprobe 获取真实的 codec_type,确保分类准确无误.
 1. Intelligent stream detection: Uses ffprobe to get the real codec_type, ensuring accurate classification.
-1. インテリジェントなストリーム検出 : ffprobeを利用して実際のcodec_typeを取得し、正確な分類を保証します。
+1. インテリジェントなストリーム検出 : ffprobeを利用して実際のcodec_typeを取得し、正確な分類を保証します.
 
-2. 无损合并 : 采用 stream copy 模式,将视频、多音轨、多字幕无损封装至 MKV 容器。
+2. 无损合并 : 采用 stream copy 模式,将视频、多音轨、多字幕无损封装至 MKV 容器.
 2. Lossless merging: Uses stream copy mode to losslessly mux video, multiple audio tracks, and multiple subtitles into an MKV container.
-2. 無劣化結合 : ストリームコピーモードを使用し、ビデオ、複数のオーディオトラック、複数の字幕をMKVコンテナに無劣化で多重化します。
+2. 無劣化結合 : ストリームコピーモードを使用し、ビデオ、複数のオーディオトラック、複数の字幕をMKVコンテナに無劣化で多重化します.
 
-3. 降级容错机制 : 当字幕流直接 copy 失败时,自动尝试重编码为 MKV 兼容格式。
+3. 降级容错机制 : 当字幕流直接 copy 失败时,自动尝试重编码为 MKV 兼容格式.
 3. Fallback fault-tolerance mechanism: Automatically attempts to re-encode subtitles into an MKV-compatible format when direct subtitle copy fails.
-3. フォールバックフォールトトレランス機制 : 字幕ストリームの直接コピーが失敗した場合、MKV互換フォーマットへの再エンコードを自動的に試みます。
+3. フォールバックフォールトトレランス機制 : 字幕ストリームの直接コピーが失敗した場合、MKV互換フォーマットへの再エンコードを自動的に試みます.
 
-4. 灵活的工作模式 : 支持交互式命令行选择、自动同名匹配合并以及命令行参数直接指定。
+4. 灵活的工作模式 : 支持交互式命令行选择、自动同名匹配合并以及命令行参数直接指定.
 4. Flexible working modes: Supports interactive command-line selection, automatic same-name matching merge, and direct specification via command-line arguments.
-4. 柔軟な動作モード : 対話型コマンドライン選択、自動同名マッチング結合、およびコマンドライン引数による直接指定をサポートします。
+4. 柔軟な動作モード : 対話型コマンドライン選択、自動同名マッチング結合、およびコマンドライン引数による直接指定をサポートします.
 
-5. 跨平台兼容 : 自动在系统 PATH 及常见安装目录中查找 ffmpeg/ffprobe 可执行文件。
+5. 跨平台兼容 : 自动在系统 PATH 及常见安装目录中查找 ffmpeg/ffprobe 可执行文件.
 5. Cross-platform compatibility: Automatically searches for ffmpeg/ffprobe executables in the system PATH and common installation directories.
-5. クロスプラットフォーム互換性 : システムPATHおよび一般的なインストールディレクトリ内でffmpeg/ffprobeの実行ファイルを自動的に検索します。
+5. クロスプラットフォーム互換性 : システムPATHおよび一般的なインストールディレクトリ内でffmpeg/ffprobeの実行ファイルを自動的に検索します.
 ================================================================================
 """
 
@@ -259,7 +259,7 @@ class FFmpegMediaMerger:
         # ffmpegが見つからない場合、ランタイムエラーをスローしインストール方法を促す
         if not self.ffmpeg_path:
             raise RuntimeError(
-                "未找到 ffmpeg,请安装或将其加入 PATH。\n"
+                "未找到 ffmpeg,请安装或将其加入 PATH.\n"
                 "  Windows: https://www.gyan.dev/ffmpeg/builds/\n"
                 "  macOS  : brew install ffmpeg\n"
                 "  Linux  : sudo apt install ffmpeg"
@@ -441,12 +441,12 @@ class FFmpegMediaMerger:
     def probe_file(self, file_path: Path) -> StreamInfo:
 
         """
-        检测文件实际包含的流类型。
-        优先使用 ffprobe；若不可用则退回到扩展名猜测。
+        检测文件实际包含的流类型.
+        优先使用 ffprobe ; 若不可用则退回到扩展名猜测.
         Detect actual stream types contained in the file.
         Prioritize ffprobe; fallback to extension guessing if unavailable.
-        ファイルに実際に含まれるストリームタイプを検出。
-        ffprobeを優先し、利用できない場合は拡張子推測にフォールバック。
+        ファイルに実際に含まれるストリームタイプを検出.
+        ffprobeを優先し、利用できない場合は拡張子推測にフォールバック.
         """
 
         # 初始化 StreamInfo 对象
@@ -600,20 +600,20 @@ class FFmpegMediaMerger:
     # 实例方法 : 扫描工作目录,分类文件
     # Scan working directory, return three lists: (video files, audio files, subtitle files).
     # Classification is based on actual stream types detected by ffprobe, not extensions.
-    # 作業ディレクトリをスキャンし、(ビデオファイル、オーディオファイル、字幕ファイル)の3つのリストを返す。
-    # 分類は拡張子ではなく、ffprobeによって検出された実際のストリームタイプに基づく。
+    # 作業ディレクトリをスキャンし、(ビデオファイル、オーディオファイル、字幕ファイル)の3つのリストを返す.
+    # 分類は拡張子ではなく、ffprobeによって検出された実際のストリームタイプに基づく.
     def scan_directory(self) -> Tuple[List[StreamInfo], List[StreamInfo], List[StreamInfo]]:
 
         """
-        扫描工作目录,返回 (视频文件, 音频文件, 字幕文件) 三个列表。
+        扫描工作目录,返回 (视频文件, 音频文件, 字幕文件) 三个列表.
 
-        分类依据是 ffprobe 检测到的实际流类型,而非扩展名。
+        分类依据是 ffprobe 检测到的实际流类型,而非扩展名.
         Classification is based on actual stream types detected by ffprobe, not extensions.
-        分類は拡張子ではなく、ffprobeによって検出された実際のストリームタイプに基づく。
+        分類は拡張子ではなく、ffprobeによって検出された実際のストリームタイプに基づく.
 
-        一个文件可以同时出现在多个列表中 ( 如含视频+音频的 mkv) 。
+        一个文件可以同时出现在多个列表中 ( 如含视频+音频的 mkv) .
         A file can appear in multiple lists simultaneously (such as mkv with video+audio).
-        ファイルは複数のリストに同時に出現することができる ( ビデオ+オーディオを含むmkvなど) 。
+        ファイルは複数のリストに同時に出現することができる ( ビデオ+オーディオを含むmkvなど) .
         """
 
         # 初始化三个空列表
@@ -705,14 +705,14 @@ class FFmpegMediaMerger:
     # 实例方法 : 扫描所有含音频流的文件
     # Scan all files containing audio streams (including those with video) for audio selection step.
     # Add to result list as long as it contains audio streams
-    # オーディオ選択ステップのために、オーディオストリームを含むすべてのファイル ( ビデオを含むものも含む) をスキャン。
+    # オーディオ選択ステップのために、オーディオストリームを含むすべてのファイル ( ビデオを含むものも含む) をスキャン.
     # オーディオストリームを含む限り結果リストに追加
     def scan_all_for_audio(self) -> List[StreamInfo]:
 
         """
-        扫描所有含音频流的文件 ( 包括同时含视频的文件) ,用于音频选择步骤。
+        扫描所有含音频流的文件 ( 包括同时含视频的文件) ,用于音频选择步骤.
         For audio selection step.
-        オーディオ選択ステップ用。
+        オーディオ選択ステップ用.
         """
 
         # 初始化结果列表
@@ -759,7 +759,7 @@ class FFmpegMediaMerger:
     # 实例方法 : 扫描所有含字幕流或为纯字幕格式的文件
     # Scan all files containing subtitle streams or pure subtitle formats.
     # Pure subtitle extensions are included directly, other extensions with subtitle streams (and no audio/video) are also included
-    # 字幕ストリームを含む、または純粋な字幕フォーマットのすべてのファイルをスキャン。
+    # 字幕ストリームを含む、または純粋な字幕フォーマットのすべてのファイルをスキャン.
     # 純粋な字幕拡張子は直接含め、他の拡張子でも字幕ストリームを含む ( オーディオ/ビデオなし) ものは含める
     def scan_all_for_subtitles(self) -> List[StreamInfo]:
 
@@ -814,11 +814,11 @@ class FFmpegMediaMerger:
 
     # FFmpeg 命令构建
     # Build precise FFmpeg command. Video file extracts video stream and built-in audio/subtitles; external audio extracts only audio; external subtitles extract only subtitles. All use copy mode (lossless).
-    #　正確なFFmpegコマンドを構築。ビデオファイルはビデオストリームおよび内蔵のオーディオ/字幕を抽出、外部オーディオはオーディオのみ、外部字幕は字幕のみを抽出。すべてcopyモード ( 無劣化) を使用。
+    #　正確なFFmpegコマンドを構築.ビデオファイルはビデオストリームおよび内蔵のオーディオ/字幕を抽出、外部オーディオはオーディオのみ、外部字幕は字幕のみを抽出.すべてcopyモード ( 無劣化) を使用.
     
     # 实例方法 : 构建精确的 FFmpeg 命令
     # Build precise FFmpeg command. Video file extracts video stream and built-in audio/subtitles; external audio extracts only audio; external subtitles extract only subtitles. All use copy mode (lossless).
-    # 正確なFFmpegコマンドを構築。ビデオファイルはビデオストリームおよび内蔵のオーディオ/字幕を抽出、外部オーディオはオーディオのみ、外部字幕は字幕のみを抽出。すべてcopyモード ( 無劣化) を使用。
+    # 正確なFFmpegコマンドを構築.ビデオファイルはビデオストリームおよび内蔵のオーディオ/字幕を抽出、外部オーディオはオーディオのみ、外部字幕は字幕のみを抽出.すべてcopyモード ( 無劣化) を使用.
     def _build_command(
         self,
         video_file: Path,
@@ -828,11 +828,11 @@ class FFmpegMediaMerger:
     ) -> List[str]:
 
         """
-        构建精确的 FFmpeg 命令。
+        构建精确的 FFmpeg 命令.
         - 视频文件 : 提取视频流 ( 以及其自带的音频/字幕流) 
         - 外部音频文件 : 只提取音频流
         - 外部字幕文件 : 只提取字幕流
-        全部使用 copy 模式 ( 无损) 。
+        全部使用 copy 模式 ( 无损) .
 
         Build precise FFmpeg command.
         Video file extracts video stream (and its built-in audio/subtitle streams)
@@ -840,11 +840,11 @@ class FFmpegMediaMerger:
         External subtitle files extract only subtitle streams.
         All use copy mode (lossless).
 
-        正確なFFmpegコマンドを構築。
+        正確なFFmpegコマンドを構築.
         ビデオファイル : ビデオストリーム ( およびその内蔵オーディオ/字幕ストリーム) を抽
         外部オーディオファイル : オーディオストリームのみ抽
-        外部字幕ファイル : 字幕ストリームのみ抽出。
-        すべてcopyモード ( 無劣化) を使用。
+        外部字幕ファイル : 字幕ストリームのみ抽出.
+        すべてcopyモード ( 無劣化) を使用.
         """
 
         # 初始化命令列表,包含 ffmpeg 路径和全局参数
@@ -934,8 +934,8 @@ class FFmpegMediaMerger:
     # 实例方法 : 构建备用命令 ( 字幕降级重编码) 
     # Fallback command: When -c:s copy fails, re-encode subtitles to srt/ass.
     # Keep video and audio as copy, do not use -c:s copy, let ffmpeg automatically choose MKV-compatible subtitle encoder.
-    # 予備コマンド : -c:s copyが失敗した場合、字幕をsrt/assに再エンコード。
-    # ビデオとオーディオはcopyを維持し、-c:s copyを使用せず、ffmpegにMKV互換の字幕エンコーダーを自動選択させる。
+    # 予備コマンド : -c:s copyが失敗した場合、字幕をsrt/assに再エンコード.
+    # ビデオとオーディオはcopyを維持し、-c:s copyを使用せず、ffmpegにMKV互換の字幕エンコーダーを自動選択させる.
     def _build_command_with_subtitle_fallback(
         self,
         video_file: Path,
@@ -945,14 +945,14 @@ class FFmpegMediaMerger:
     ) -> List[str]:
 
         """
-        备用命令 : 当 -c:s copy 失败时,将字幕重编码为 srt/ass。
-        MKV 原生支持 srt 和 ass,这是有损的字幕转换但几乎不影响使用。
+        备用命令 : 当 -c:s copy 失败时,将字幕重编码为 srt/ass.
+        MKV 原生支持 srt 和 ass,这是有损的字幕转换但几乎不影响使用.
 
         Fallback command: When -c:s copy fails, re-encode subtitles to srt/ass.
         MKV natively supports srt and ass, this is a lossy subtitle conversion but hardly affects usage.
 
-        予備コマンド : -c:s copyが失敗した場合、字幕をsrt/assに再エンコード。
-        MKVはsrtとassをネイティブサポートしており、これは劣化した字幕変換だが使用にはほとんど影響しない。
+        予備コマンド : -c:s copyが失敗した場合、字幕をsrt/assに再エンコード.
+        MKVはsrtとassをネイティブサポートしており、これは劣化した字幕変換だが使用にはほとんど影響しない.
         """
 
         # 初始化命令列表
@@ -1015,8 +1015,8 @@ class FFmpegMediaMerger:
     # 合并执行
     # Execute merge, return whether successful. Parse all input/output paths to absolute paths.
     # Validate video file existence, filter valid audio and subtitle files.
-    # 結合を実行し、成功したかどうかを返す。すべての入出力パスを絶対パスに解析。
-    # ビデオファイルの存在を検証し、有効なオーディオおよび字幕ファイルをフィルタリング。
+    # 結合を実行し、成功したかどうかを返す.すべての入出力パスを絶対パスに解析.
+    # ビデオファイルの存在を検証し、有効なオーディオおよび字幕ファイルをフィルタリング.
     
     # 实例方法 : 执行合并操作
     # Execute merge, return whether successful
@@ -1124,7 +1124,7 @@ class FFmpegMediaMerger:
                 size_mb = output_path.stat().st_size / (1024 * 1024)
                 print(f"\n  [成功] {output_path}  ({size_mb:.1f} MB)")
             else:
-                print(f"\n  [失败] 合并未成功,请检查输入文件。")
+                print(f"\n  [失败] 合并未成功,请检查输入文件.")
             return success
         except Exception as e:
 
@@ -1138,7 +1138,7 @@ class FFmpegMediaMerger:
             
     # 静态方法 : 检查文件是否有效
     # Check if file is valid: skip and return False if not exists, empty (0 bytes), or inaccessible.
-    # ファイルが有効かチェック : 存在しない、空 ( 0バイト) 、アクセス不可の場合はスキップしてFalseを返す。
+    # ファイルが有効かチェック : 存在しない、空 ( 0バイト) 、アクセス不可の場合はスキップしてFalseを返す.
     @staticmethod
     def _check_file(path: Path, label: str) -> bool:
 
@@ -1167,7 +1167,7 @@ class FFmpegMediaMerger:
         
     # 静态方法 : 执行 FFmpeg 命令
     # Execute FFmpeg command: Start subprocess using Popen, wait for completion (1 hour timeout). Return code 0 indicates success.
-    # FFmpegコマンドを実行 : Popenを使用してサブプロセスを開始し、完了を待つ ( 1時間タイムアウト) 。リターンコード0は成功を示す。
+    # FFmpegコマンドを実行 : Popenを使用してサブプロセスを開始し、完了を待つ ( 1時間タイムアウト) .リターンコード0は成功を示す.
     @staticmethod
     def _execute(cmd: List[str]) -> bool:
 
@@ -1243,7 +1243,7 @@ class FFmpegMediaMerger:
             
     # 交互模式
     # Interactive file selection. Core improvement: Detect actual stream types via ffprobe, no longer relying on extension classification.
-    # 対話型ファイル選択。中核となる改善点 : ffprobeを通じて実際のストリームタイプを検出し、拡張子分類に依存しない。
+    # 対話型ファイル選択.中核となる改善点 : ffprobeを通じて実際のストリームタイプを検出し、拡張子分類に依存しない.
     
     # 实例方法 : 交互式文件选择
     # Interactive file selection
@@ -1251,20 +1251,20 @@ class FFmpegMediaMerger:
     def interactive(self) -> bool:
 
         """
-        交互式文件选择。
+        交互式文件选择.
         核心改进 : 通过 ffprobe 检测实际流类型,
         .webm ( 纯音频) 会出现在音频列表中,
-        不再依赖扩展名分类。
+        不再依赖扩展名分类.
 
         Interactive file selection.
         Core improvement: Detect actual stream types via ffprobe,
         .webm (pure audio) will appear in audio list,
         no longer rely on extension classification.
 
-        対話型ファイル選択。
+        対話型ファイル選択.
         中核となる改善点 : ffprobeを通じて実際のストリームタイプを検出し、
         .webm ( 純粋なオーディオ) はオーディオリストに表示され、
-        拡張子分類に依存しない。
+        拡張子分類に依存しない.
         """
         try:
 
@@ -1398,7 +1398,7 @@ class FFmpegMediaMerger:
             # ユーザー確認を待つ
             confirm = input("\n  确认执行？(Y/n): ").strip().lower()
             if confirm == 'n':
-                print("  已取消。")
+                print("  已取消.")
                 return False
                 
             # 输出文件名
@@ -1430,7 +1430,7 @@ class FFmpegMediaMerger:
             # 捕获 Ctrl+C 中断
             # Catch Ctrl+C interrupt
             # Ctrl+C割り込みをキャッチ
-            print("\n\n  操作已取消。")
+            print("\n\n  操作已取消.")
             return False
         except Exception as e:
 
@@ -1444,7 +1444,7 @@ class FFmpegMediaMerger:
             
     # 静态方法 : 从列表中选择单个文件
     # Pick one from list: Supports numeric index or filename keyword matching.
-    # リストから1つ選択 : 数字インデックスまたはファイル名キーワードマッチングをサポート。
+    # リストから1つ選択 : 数字インデックスまたはファイル名キーワードマッチングをサポート.
     @staticmethod
     def _pick_one(items: List[StreamInfo], label: str) -> Optional[StreamInfo]:
 
@@ -1497,7 +1497,7 @@ class FFmpegMediaMerger:
                 
     # 静态方法 : 从列表中多选文件
     # Pick multiple from list: Supports comma/space separation, supports 'all' keyword for select all, Enter to skip.
-    # リストから複数選択 : カンマ/スペース区切りをサポートし、'all'キーワードで全選択をサポート、Enterでスキップ。
+    # リストから複数選択 : カンマ/スペース区切りをサポートし、'all'キーワードで全選択をサポート、Enterでスキップ.
     @staticmethod
     def _pick_multiple(items: List[StreamInfo], label: str) -> List[StreamInfo]:
 
@@ -1556,8 +1556,8 @@ class FFmpegMediaMerger:
     # 自动模式
     # Automatically match same-name files and merge.
     # Determine output directory, scan directory to get all media lists.
-    # 同名ファイルを自動的にマッチングして結合。
-    # 出力ディレクトリを決定し、ディレクトリをスキャンしてすべてのメディアリストを取得。
+    # 同名ファイルを自動的にマッチングして結合.
+    # 出力ディレクトリを決定し、ディレクトリをスキャンしてすべてのメディアリストを取得.
     
     # 实例方法 : 自动匹配同名文件并合并
     # Automatically match same-name files and merge
