@@ -4,7 +4,7 @@
 # 中文：
 #   本脚本是一个纯标准库实现的小说自动排版工具。
 #   它能够自动识别小说文件中的"卷"和"章"结构，提取书名、作者、内容简介等元数据，
-#   并对正文内容进行智能换行排版（基于标点符号断句），最终输出结构化的 JSON 文件
+#   并对正文内容进行智能换行排版(基于标点符号断句)，最终输出结构化的 JSON 文件
 #   和排版美观的 TXT 文件。支持 UTF-8、GBK、GB18030、UTF-16 多种编码自动检测。
 #   无需安装任何第三方依赖，开箱即用。
 #
@@ -50,8 +50,8 @@ import json
 # Maximum number of characters per line for the innermost content; auto-wraps at punctuation if exceeded
 MAX_LINE_LENGTH = 40
 
-# 默认卷名（如果小说开头直接是章节，没有写"第X卷"，则归入此卷）
-# デフォルト巻名（小説の冒頭が直接「章」で、「第X巻」がない場合、この巻に帰属させる）
+# 默认卷名(如果小说开头直接是章节，没有写"第X卷"，则归入此卷)
+# デフォルト巻名(小説の冒頭が直接「章」で、「第X巻」がない場合、この巻に帰属させる)
 # Default volume name (if the novel starts directly with chapters without a "Volume X" header, they go here)
 DEFAULT_VOLUME = "未分卷_正文"
 
@@ -126,8 +126,8 @@ def clean_header_and_meta(text):
     # Create an empty list to store the cleaned lines
     cleaned_lines = []
 
-    # 1. 屏蔽开头的干扰信息（逐行判断，避免正则贪婪匹配误删正文）
-    # 1. 冒頭の干渉情報を屏蔽（行ごとに判断し、正規表現の貪欲マッチングによる本文誤削除を防止）
+    # 1. 屏蔽开头的干扰信息(逐行判断，避免正则贪婪匹配误删正文)
+    # 1. 冒頭の干渉情報を屏蔽(行ごとに判断し、正規表現の貪欲マッチングによる本文誤削除を防止)
     # 1. Block leading interference info (check line by line to avoid regex greedy matching deleting body text)
 
     # 设置一个标志位，标记是否还处于文件头部的干扰区域
@@ -192,8 +192,8 @@ def clean_header_and_meta(text):
     # If matched, extract the author name; otherwise use a default value
     meta['作者'] = author_match.group(1).strip() if author_match else "未知作者"
 
-    # 匹配 内容简介（可能是多行，直到遇到第一个"第X卷/章"或连续空行或文本末尾）
-    # 内容紹介をマッチ（複数行の可能性あり、最初の「第X巻/章」または連続空行またはテキスト末尾まで）
+    # 匹配 内容简介(可能是多行，直到遇到第一个"第X卷/章"或连续空行或文本末尾)
+    # 内容紹介をマッチ(複数行の可能性あり、最初の「第X巻/章」または連続空行またはテキスト末尾まで)
     # Match synopsis (may be multi-line, until the first "Volume/Chapter X", consecutive blank lines, or end of text)
     intro_pattern = r'(?:内容简介|简介|内容)[/：:\s]+([\s\S]*?)(?=\n第[零一二三四五六七八九十百千万\d]+[卷章]|\n\n|\Z)'
 
@@ -272,8 +272,8 @@ def parse_novel_structure(text):
         # Extract the title text and strip leading/trailing whitespace
         title = match.group(1).strip()
 
-        # 记录当前标题结束位置（即正文内容的起始位置）
-        # 現在のタイトルの終了位置（すなわち本文内容の開始位置）を記録
+        # 记录当前标题结束位置(即正文内容的起始位置)
+        # 現在のタイトルの終了位置(すなわち本文内容の開始位置)を記録
         # Record the end position of the current title (i.e., the start position of the body content)
         start_idx = match.end()
 
@@ -352,9 +352,9 @@ def parse_novel_structure(text):
 # Define a text auto-wrapping function
 def wrap_text_content(content, max_len):
     """
-    限制单行字数，达到限制值时智能换行（仅处理最里面的内容）
+    限制单行字数，达到限制值时智能换行(仅处理最里面的内容)
 
-    1行の文字数を制限し、制限値に達したらインテリジェントに改行（最も内側の内容のみ処理）
+    1行の文字数を制限し、制限値に達したらインテリジェントに改行(最も内側の内容のみ処理)
 
     Limit characters per line; intelligently wrap when the limit is reached (only processes innermost content)
     """
@@ -372,8 +372,8 @@ def wrap_text_content(content, max_len):
     # 行ごとに走査して処理
     # Iterate through each line for processing
     for line in lines:
-        # 如果当前行为空行（去除空格后为空），直接保留
-        # 現在の行が空行の場合（空白除去後が空）、そのまま保持
+        # 如果当前行为空行(去除空格后为空)，直接保留
+        # 現在の行が空行の場合(空白除去後が空)、そのまま保持
         # If the current line is blank (empty after stripping), keep it as is
         if not line.strip():
             # 将空行原样加入结果列表
@@ -408,17 +408,17 @@ def wrap_text_content(content, max_len):
                 # 定义中英文标点符号集合，用于寻找合适的断句位置
                 # 中国語と英語の句読点集合を定義、適切な改行位置を探すために使用
                 # Define a set of Chinese and English punctuation marks for finding suitable break points
-                punctuations = "，。！？；：、,.!?;:""'】）"
-                # 从最大长度位置向前搜索（最多回退10个字符），寻找标点符号
-                # 最大長の位置から前方に検索（最大10文字まで戻す）、句読点を探す
+                punctuations = "，。！？；：、,.!?;:""'】)"
+                # 从最大长度位置向前搜索(最多回退10个字符)，寻找标点符号
+                # 最大長の位置から前方に検索(最大10文字まで戻す)、句読点を探す
                 # Search backwards from the max length position (up to 10 characters) for punctuation
                 for i in range(max_len, max(0, max_len - 10), -1):
                     # 如果在搜索范围内找到标点符号
                     # 検索範囲内で句読点を見つけた場合
                     # If a punctuation mark is found within the search range
                     if line[i] in punctuations:
-                        # 将切割位置设在标点符号之后（保留标点在上一行末尾）
-                        # カット位置を句読点の後に設定（句読点を前の行の末尾に保持）
+                        # 将切割位置设在标点符号之后(保留标点在上一行末尾)
+                        # カット位置を句読点の後に設定(句読点を前の行の末尾に保持)
                         # Set the cut position right after the punctuation (keep punctuation at end of previous line)
                         cut_idx = i + 1
                         # 找到后立即跳出搜索循环
@@ -433,8 +433,8 @@ def wrap_text_content(content, max_len):
                 # 残りの未処理テキストを更新
                 # Update the remaining unprocessed text
                 line = line[cut_idx:]
-            # 循环结束后，如果还有剩余文本（不为空）
-            # ループ終了後、まだ残りテキストがある場合（空でない）
+            # 循环结束后，如果还有剩余文本(不为空)
+            # ループ終了後、まだ残りテキストがある場合(空でない)
             # After the loop ends, if there is remaining text (not empty)
             if line:
                 # 将最后剩余的文本加入结果列表
@@ -460,8 +460,8 @@ def save_outputs(final_dict, directory, base_name):
     First save as JSON, then convert to a formatted TXT
     """
 
-    # 1. 保存为 JSON（保证数据结构绝对正确，无冲突）
-    # 1. JSONとして保存（データ構造の絶対的な正確性を保証、衝突なし）
+    # 1. 保存为 JSON(保证数据结构绝对正确，无冲突)
+    # 1. JSONとして保存(データ構造の絶対的な正確性を保証、衝突なし)
     # 1. Save as JSON (ensures data structure is absolutely correct, no conflicts)
 
     # 拼接 JSON 文件的完整路径
@@ -469,8 +469,8 @@ def save_outputs(final_dict, directory, base_name):
     # Concatenate the full path for the JSON file
     json_path = os.path.join(directory, f"{base_name}_parsed.json")
 
-    # 以 UTF-8 编码打开（创建）JSON 文件进行写入
-    # UTF-8エンコーディングでJSONファイルを開く（作成）して書き込み
+    # 以 UTF-8 编码打开(创建)JSON 文件进行写入
+    # UTF-8エンコーディングでJSONファイルを開く(作成)して書き込み
     # Open (create) the JSON file with UTF-8 encoding for writing
     with open(json_path, 'w', encoding='utf-8') as f:
         # 将最终字典序列化为 JSON 格式写入文件
@@ -498,8 +498,8 @@ def save_outputs(final_dict, directory, base_name):
     # Concatenate the full path for the TXT file
     txt_path = os.path.join(directory, f"{base_name}_formatted.txt")
 
-    # 以 UTF-8 编码打开（创建）TXT 文件进行写入
-    # UTF-8エンコーディングでTXTファイルを開く（作成）して書き込み
+    # 以 UTF-8 编码打开(创建)TXT 文件进行写入
+    # UTF-8エンコーディングでTXTファイルを開く(作成)して書き込み
     # Open (create) the TXT file with UTF-8 encoding for writing
     with open(txt_path, 'w', encoding='utf-8') as f:
         # 写入书名标题行
@@ -539,8 +539,8 @@ def save_outputs(final_dict, directory, base_name):
                 # 章の本文内容にインテリジェントな改行レイアウトを適用
                 # Apply intelligent line-wrapping formatting to the chapter body content
                 formatted_content = wrap_text_content(content, MAX_LINE_LENGTH)
-                # 为每一行添加两个空格的首行缩进（空行保持为空）
-                # 各行に2スペースの先頭インデントを追加（空行は空のまま）
+                # 为每一行添加两个空格的首行缩进(空行保持为空)
+                # 各行に2スペースの先頭インデントを追加(空行は空のまま)
                 # Add a two-space indent to each line (blank lines remain blank)
                 indented_content = '\n'.join(['  ' + line if line.strip() else '' for line in formatted_content.split('\n')])
                 # 将缩进后的章节内容写入文件，末尾加两个换行符作为章节间距
@@ -641,8 +641,8 @@ def main():
         # 内容紹介
         # Synopsis
         "内容简介": meta_data['内容简介'],
-        # 正文结构（卷-章嵌套字典）
-        # 本文構造（巻-章ネスト辞書）
+        # 正文结构(卷-章嵌套字典)
+        # 本文構造(巻-章ネスト辞書)
         # Body structure (volume-chapter nested dictionary)
         "正文": novel_structure
     }
