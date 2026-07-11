@@ -6,40 +6,38 @@
 作者署名: 张龙
 ================================================================================
 脚本介绍:
-本脚本是一个基于 Python 编写的高级 FFmpeg 媒体合并工具。其核心创新点在于
-摒弃了传统仅依赖文件扩展名来判断媒体类型的做法，转而通过调用 ffprobe 
-对文件内部的实际流（视频流、音频流、字幕流）进行深度检测与解析。
-这使得工具能够精准识别诸如“包含纯音频的 .webm 文件”或“包含字幕流的 .mkv 文件”
-等复杂情况，从而实现无损、高效的媒体封装。
+本脚本是一个基于 Python 编写的高级 FFmpeg 媒体合并工具.
+其核心创新点在于摒弃了传统仅依赖文件扩展名来判断媒体类型的做法, 转而通过调用 ffprobe 对文件内部的实际流（视频流、音频流、字幕流）进行深度检测与解析.
+这使得工具能够精准识别诸如“包含纯音频的 .webm 文件”或“包含字幕流的 .mkv 文件”等复杂情况, 从而实现无损、高效的媒体封装.
 
-主要功能包括：
-1. 智能流检测：利用 ffprobe 获取真实的 codec_type，确保分类准确无误。
-2. 无损合并：采用 stream copy 模式，将视频、多音轨、多字幕无损封装至 MKV 容器。
-3. 降级容错机制：当字幕流直接 copy 失败时，自动尝试重编码为 MKV 兼容格式。
-4. 灵活的工作模式：支持交互式命令行选择、自动同名匹配合并以及命令行参数直接指定。
-5. 跨平台兼容：自动在系统 PATH 及常见安装目录中查找 ffmpeg/ffprobe 可执行文件。
+主要功能包括 : 
+1. 智能流检测 : 利用 ffprobe 获取真实的 codec_type, 确保分类准确无误.
+2. 无损合并 : 采用 stream copy 模式, 将视频、多音轨、多字幕无损封装至 MKV 容器.
+3. 降级容错机制 : 当字幕流直接 copy 失败时, 自动尝试重编码为 MKV 兼容格式.
+4. 灵活的工作模式 : 支持交互式命令行选择、自动同名匹配合并以及命令行参数直接指定.
+5. 跨平台兼容 : 自动在系统 PATH 及常见安装目录中查找 ffmpeg/ffprobe 可执行文件.
 ================================================================================
 """
 
-# 导入操作系统接口模块，用于环境变量和路径判断
+# 导入操作系统接口模块, 用于环境变量和路径判断
 import os
-# 导入系统特定参数模块，用于退出程序
+# 导入系统特定参数模块, 用于退出程序
 import sys
-# 导入子进程模块，用于调用外部 ffmpeg 和 ffprobe 命令
+# 导入子进程模块, 用于调用外部 ffmpeg 和 ffprobe 命令
 import subprocess
-# 导入 JSON 模块，用于解析 ffprobe 返回的 JSON 数据
+# 导入 JSON 模块, 用于解析 ffprobe 返回的 JSON 数据
 import json
-# 导入 shutil 模块，用于跨平台查找可执行文件
+# 导入 shutil 模块, 用于跨平台查找可执行文件
 import shutil
-# 导入 pathlib 模块，用于面向对象的路径操作
+# 导入 pathlib 模块, 用于面向对象的路径操作
 from pathlib import Path
-# 导入 typing 模块，用于类型提示，增强代码可读性
+# 导入 typing 模块, 用于类型提示, 增强代码可读性
 from typing import List, Dict, Optional, Tuple, Union
 
 # ─────────────────────────────────────────────
-# 扩展名白名单（仅用于初筛，不作为最终分类依据）
+# 扩展名白名单（仅用于初筛, 不作为最终分类依据）
 # ─────────────────────────────────────────────
-# 定义支持的媒体文件扩展名集合，用于快速过滤非媒体文件
+# 定义支持的媒体文件扩展名集合, 用于快速过滤非媒体文件
 ALL_MEDIA_EXTENSIONS = {
     # 视频容器 / 纯视频格式
     'mp4', 'mkv', 'avi', 'mov', 'flv', 'wmv', 'mpg', 'mpeg',
@@ -63,11 +61,11 @@ ALL_MEDIA_EXTENSIONS = {
 # 定义单个文件的流信息数据类
 class StreamInfo:
     """单个文件的流信息"""
-    # 使用 __slots__ 限制属性，优化内存占用
+    # 使用 __slots__ 限制属性, 优化内存占用
     __slots__ = ('path', 'has_video', 'has_audio', 'has_subtitle',
                  'video_count', 'audio_count', 'subtitle_count', 'streams')
     
-    # 初始化方法，传入文件路径
+    # 初始化方法, 传入文件路径
     def __init__(self, path: Path):
         # 保存文件路径对象
         self.path = path
@@ -86,29 +84,29 @@ class StreamInfo:
         # 存储详细的流信息字典列表
         self.streams: List[dict] = []
         
-    # 定义对象的字符串表示形式，便于调试打印
+    # 定义对象的字符串表示形式, 便于调试打印
     def __repr__(self):
         # 初始化标签列表
         tags = []
-        # 如果有视频流，添加视频数量标签
+        # 如果有视频流, 添加视频数量标签
         if self.has_video:
             tags.append(f'V×{self.video_count}')
-        # 如果有音频流，添加音频数量标签
+        # 如果有音频流, 添加音频数量标签
         if self.has_audio:
             tags.append(f'A×{self.audio_count}')
-        # 如果有字幕流，添加字幕数量标签
+        # 如果有字幕流, 添加字幕数量标签
         if self.has_subtitle:
             tags.append(f'S×{self.subtitle_count}')
-        # 返回格式化的字符串，包含文件名和流标签
+        # 返回格式化的字符串, 包含文件名和流标签
         return f"<{self.path.name} [{', '.join(tags)}]>"
 
 # 定义 FFmpeg 媒体合并器主类
 class FFmpegMediaMerger:
     """FFmpeg 媒体合并器 — 基于 ffprobe 流检测"""
     
-    # 初始化方法，可选传入工作目录
+    # 初始化方法, 可选传入工作目录
     def __init__(self, working_dir: Optional[str] = None):
-        # 解析并保存工作目录的绝对路径，默认为当前目录
+        # 解析并保存工作目录的绝对路径, 默认为当前目录
         self.working_dir = Path(working_dir).resolve() if working_dir else Path.cwd()
         # 设置详细输出模式为 True
         self.verbose = True
@@ -116,10 +114,10 @@ class FFmpegMediaMerger:
         self.ffmpeg_path = self._locate_binary('ffmpeg')
         # 查找 ffprobe 可执行文件路径
         self.ffprobe_path = self._locate_binary('ffprobe')
-        # 如果找不到 ffmpeg，抛出运行时错误并提示安装方法
+        # 如果找不到 ffmpeg, 抛出运行时错误并提示安装方法
         if not self.ffmpeg_path:
             raise RuntimeError(
-                "未找到 ffmpeg，请安装或将其加入 PATH。\n"
+                "未找到 ffmpeg, 请安装或将其加入 PATH.\n"
                 "  Windows: https://www.gyan.dev/ffmpeg/builds/\n"
                 "  macOS  : brew install ffmpeg\n"
                 "  Linux  : sudo apt install ffmpeg"
@@ -127,13 +125,13 @@ class FFmpegMediaMerger:
             
     # ────────────── 工具方法 ──────────────
     
-    # 静态方法：在 PATH 和常见位置中查找可执行文件
+    # 静态方法 : 在 PATH 和常见位置中查找可执行文件
     @staticmethod
     def _locate_binary(name: str) -> Optional[str]:
         """在 PATH 和常见位置中查找可执行文件"""
         # 1. 使用 shutil.which 跨平台查找
         found = shutil.which(name)
-        # 如果找到了，直接返回路径
+        # 如果找到了, 直接返回路径
         if found:
             return found
             
@@ -168,23 +166,23 @@ class FFmpegMediaMerger:
         for d in extras:
             # 拼接完整的候选文件路径
             candidate = d / f'{name}{suffix}'
-            # 如果文件存在，返回其字符串路径
+            # 如果文件存在, 返回其字符串路径
             if candidate.exists():
                 return str(candidate)
-        # 如果都没找到，返回 None
+        # 如果都没找到, 返回 None
         return None
         
-    # 实例方法：用 ffprobe 获取文件流信息
+    # 实例方法 : 用 ffprobe 获取文件流信息
     def _run_ffprobe(self, file_path: Path) -> Optional[dict]:
-        """用 ffprobe 获取文件流信息，返回 JSON dict"""
-        # 如果 ffprobe 路径不存在，直接返回 None
+        """用 ffprobe 获取文件流信息, 返回 JSON dict"""
+        # 如果 ffprobe 路径不存在, 直接返回 None
         if not self.ffprobe_path:
             return None
         try:
             # 构建 ffprobe 命令参数列表
             cmd = [
                 self.ffprobe_path,
-                '-v', 'quiet',             # 静默模式，不输出冗余信息
+                '-v', 'quiet',             # 静默模式, 不输出冗余信息
                 '-print_format', 'json',   # 输出格式为 JSON
                 '-show_streams',           # 显示流信息
                 '-show_format',            # 显示容器格式信息
@@ -203,16 +201,16 @@ class FFmpegMediaMerger:
                 # 解析 JSON 并返回字典
                 return json.loads(result.stdout)
         except Exception:
-            # 捕获所有异常，忽略错误
+            # 捕获所有异常, 忽略错误
             pass
         # 失败时返回 None
         return None
         
-    # 实例方法：检测文件实际包含的流类型
+    # 实例方法 : 检测文件实际包含的流类型
     def probe_file(self, file_path: Path) -> StreamInfo:
         """
-        检测文件实际包含的流类型。
-        优先使用 ffprobe；若不可用则退回到扩展名猜测。
+        检测文件实际包含的流类型.
+        优先使用 ffprobe；若不可用则退回到扩展名猜测.
         """
         # 初始化 StreamInfo 对象
         info = StreamInfo(file_path)
@@ -226,13 +224,13 @@ class FFmpegMediaMerger:
             for stream in probe['streams']:
                 # 获取流的类型并转为小写
                 codec_type = stream.get('codec_type', '').lower()
-                # 如果是视频流，视频计数加 1
+                # 如果是视频流, 视频计数加 1
                 if codec_type == 'video':
                     info.video_count += 1
-                # 如果是音频流，音频计数加 1
+                # 如果是音频流, 音频计数加 1
                 elif codec_type == 'audio':
                     info.audio_count += 1
-                # 如果是字幕流，字幕计数加 1
+                # 如果是字幕流, 字幕计数加 1
                 elif codec_type == 'subtitle':
                     info.subtitle_count += 1
             # 根据计数更新布尔标记
@@ -242,8 +240,8 @@ class FFmpegMediaMerger:
             # 返回探测结果
             return info
             
-        # ── ffprobe 不可用时的退路：按扩展名猜测 ──
-        # 获取文件扩展名，去除点号并转为小写
+        # ── ffprobe 不可用时的退路 : 按扩展名猜测 ──
+        # 获取文件扩展名, 去除点号并转为小写
         ext = file_path.suffix.lstrip('.').lower()
         # 定义常见的视频扩展名集合
         video_exts = {
@@ -269,7 +267,7 @@ class FFmpegMediaMerger:
             # 标记包含视频
             info.has_video = True
             info.video_count = 1
-            # 容器格式通常也含音频，默认标记包含音频
+            # 容器格式通常也含音频, 默认标记包含音频
             info.has_audio = True
             info.audio_count = 1
         # 如果扩展名在音频集合中
@@ -289,28 +287,28 @@ class FFmpegMediaMerger:
         # 返回猜测结果
         return info
         
-    # 实例方法：扫描工作目录，分类文件
+    # 实例方法 : 扫描工作目录, 分类文件
     def scan_directory(self) -> Tuple[List[StreamInfo], List[StreamInfo], List[StreamInfo]]:
         """
-        扫描工作目录，返回 (视频文件, 音频文件, 字幕文件) 三个列表。
-        分类依据是 ffprobe 检测到的实际流类型，而非扩展名。
-        一个文件可以同时出现在多个列表中（如含视频+音频的 mkv）。
+        扫描工作目录, 返回 (视频文件, 音频文件, 字幕文件) 三个列表.
+        分类依据是 ffprobe 检测到的实际流类型, 而非扩展名.
+        一个文件可以同时出现在多个列表中（如含视频+音频的 mkv）.
         """
         # 初始化三个空列表
         video_files: List[StreamInfo] = []
         audio_files: List[StreamInfo] = []
         subtitle_files: List[StreamInfo] = []
-        # 如果工作目录不是有效目录，直接返回空列表
+        # 如果工作目录不是有效目录, 直接返回空列表
         if not self.working_dir.is_dir():
             return video_files, audio_files, subtitle_files
-        # 遍历目录下的所有文件，按文件名小写排序
+        # 遍历目录下的所有文件, 按文件名小写排序
         for entry in sorted(self.working_dir.iterdir(), key=lambda p: p.name.lower()):
-            # 如果不是文件，跳过
+            # 如果不是文件, 跳过
             if not entry.is_file():
                 continue
             # 获取扩展名
             ext = entry.suffix.lstrip('.').lower()
-            # 如果扩展名不在白名单中，跳过
+            # 如果扩展名不在白名单中, 跳过
             if ext not in ALL_MEDIA_EXTENSIONS:
                 continue
             # 跳过隐藏文件、临时文件
@@ -321,11 +319,11 @@ class FFmpegMediaMerger:
                 if entry.stat().st_size == 0:
                     continue
             except OSError:
-                # 如果无法获取文件状态，跳过
+                # 如果无法获取文件状态, 跳过
                 continue
             # 探测文件流信息
             info = self.probe_file(entry)
-            # 纯字幕文件（只有字幕流，没有音视频）
+            # 纯字幕文件（只有字幕流, 没有音视频）
             if info.has_subtitle and not info.has_video and not info.has_audio:
                 subtitle_files.append(info)
                 continue
@@ -333,21 +331,21 @@ class FFmpegMediaMerger:
             if info.has_video:
                 video_files.append(info)
             # 含音频流（且无视频流）→ 放入音频列表
-            # 注意：如果文件同时有视频和音频，它已经在视频列表了，不重复放入音频列表
+            # 注意 : 如果文件同时有视频和音频, 它已经在视频列表了, 不重复放入音频列表
             if info.has_audio and not info.has_video:
                 audio_files.append(info)
         # 返回分类后的三个列表
         return video_files, audio_files, subtitle_files
         
-    # 实例方法：扫描所有含音频流的文件
+    # 实例方法 : 扫描所有含音频流的文件
     def scan_all_for_audio(self) -> List[StreamInfo]:
         """
-        扫描所有含音频流的文件（包括同时含视频的文件），
-        用于音频选择步骤。
+        扫描所有含音频流的文件（包括同时含视频的文件）, 
+        用于音频选择步骤.
         """
         # 初始化结果列表
         result: List[StreamInfo] = []
-        # 如果工作目录无效，返回空列表
+        # 如果工作目录无效, 返回空列表
         if not self.working_dir.is_dir():
             return result
         # 遍历目录文件
@@ -366,12 +364,12 @@ class FFmpegMediaMerger:
                 continue
             # 探测文件
             info = self.probe_file(entry)
-            # 只要包含音频流，就加入结果列表
+            # 只要包含音频流, 就加入结果列表
             if info.has_audio:
                 result.append(info)
         return result
         
-    # 实例方法：扫描所有含字幕流或为纯字幕格式的文件
+    # 实例方法 : 扫描所有含字幕流或为纯字幕格式的文件
     def scan_all_for_subtitles(self) -> List[StreamInfo]:
         """扫描所有含字幕流或为纯字幕格式的文件"""
         result: List[StreamInfo] = []
@@ -409,7 +407,7 @@ class FFmpegMediaMerger:
         
     # ────────────── FFmpeg 命令构建 ──────────────
     
-    # 实例方法：构建精确的 FFmpeg 命令
+    # 实例方法 : 构建精确的 FFmpeg 命令
     def _build_command(
         self,
         video_file: Path,
@@ -418,13 +416,13 @@ class FFmpegMediaMerger:
         output_file: Path,
     ) -> List[str]:
         """
-        构建精确的 FFmpeg 命令。
-        - 视频文件：提取视频流（以及其自带的音频/字幕流）
-        - 外部音频文件：只提取音频流
-        - 外部字幕文件：只提取字幕流
-        全部使用 copy 模式（无损）。
+        构建精确的 FFmpeg 命令.
+        - 视频文件 : 提取视频流（以及其自带的音频/字幕流）
+        - 外部音频文件 : 只提取音频流
+        - 外部字幕文件 : 只提取字幕流
+        全部使用 copy 模式（无损）.
         """
-        # 初始化命令列表，包含 ffmpeg 路径和全局参数
+        # 初始化命令列表, 包含 ffmpeg 路径和全局参数
         cmd: List[str] = [self.ffmpeg_path, '-y', '-hide_banner', '-loglevel', 'warning']
         
         # ── 输入文件 ──
@@ -432,19 +430,19 @@ class FFmpegMediaMerger:
         cmd.extend(['-i', str(video_file)])          # input 0: 视频
         # 记录当前输入索引
         input_index = 1
-        # 遍历外部音频文件，依次添加为输入
+        # 遍历外部音频文件, 依次添加为输入
         for af in audio_files:
             cmd.extend(['-i', str(af)])
             input_index += 1
-        # 遍历外部字幕文件，依次添加为输入
+        # 遍历外部字幕文件, 依次添加为输入
         for sf in subtitle_files:
             cmd.extend(['-i', str(sf)])
             input_index += 1
             
         # ── Map 映射 ──
-        # 从视频文件中提取：视频流 + 自带音频流 + 自带字幕流
+        # 从视频文件中提取 : 视频流 + 自带音频流 + 自带字幕流
         cmd.extend(['-map', '0:v'])         # 视频流（必须）
-        cmd.extend(['-map', '0:a?'])        # 自带音频（可选，?表示没有也不报错）
+        cmd.extend(['-map', '0:a?'])        # 自带音频（可选, ?表示没有也不报错）
         cmd.extend(['-map', '0:s?'])        # 自带字幕（可选）
         
         # 从外部音频文件中只提取音频流
@@ -458,7 +456,7 @@ class FFmpegMediaMerger:
             idx = sub_start + i
             cmd.extend(['-map', f'{idx}:s'])
             
-        # ── 编码器：全部 copy（无损）──
+        # ── 编码器 : 全部 copy（无损）──
         cmd.extend(['-c:v', 'copy'])
         cmd.extend(['-c:a', 'copy'])
         cmd.extend(['-c:s', 'copy'])
@@ -472,7 +470,7 @@ class FFmpegMediaMerger:
         cmd.append(str(output_file))
         return cmd
         
-    # 实例方法：构建备用命令（字幕降级重编码）
+    # 实例方法 : 构建备用命令（字幕降级重编码）
     def _build_command_with_subtitle_fallback(
         self,
         video_file: Path,
@@ -481,8 +479,8 @@ class FFmpegMediaMerger:
         output_file: Path,
     ) -> List[str]:
         """
-        备用命令：当 -c:s copy 失败时，将字幕重编码为 srt/ass。
-        MKV 原生支持 srt 和 ass，这是有损的字幕转换但几乎不影响使用。
+        备用命令 : 当 -c:s copy 失败时, 将字幕重编码为 srt/ass.
+        MKV 原生支持 srt 和 ass, 这是有损的字幕转换但几乎不影响使用.
         """
         # 初始化命令列表
         cmd: List[str] = [self.ffmpeg_path, '-y', '-hide_banner', '-loglevel', 'warning']
@@ -506,7 +504,7 @@ class FFmpegMediaMerger:
         # 视频和音频保持 copy
         cmd.extend(['-c:v', 'copy'])
         cmd.extend(['-c:a', 'copy'])
-        # 不使用 -c:s copy，让 ffmpeg 自动选择 MKV 兼容的字幕编码器
+        # 不使用 -c:s copy, 让 ffmpeg 自动选择 MKV 兼容的字幕编码器
         # 强制输出格式为 matroska
         cmd.extend(['-f', 'matroska'])
         # 添加输出文件
@@ -515,7 +513,7 @@ class FFmpegMediaMerger:
         
     # ────────────── 合并执行 ──────────────
     
-    # 实例方法：执行合并操作
+    # 实例方法 : 执行合并操作
     def merge_files(
         self,
         video_file: Union[str, Path],
@@ -523,7 +521,7 @@ class FFmpegMediaMerger:
         subtitle_files: Optional[List[Union[str, Path]]] = None,
         output_file: Optional[Union[str, Path]] = None,
     ) -> bool:
-        """执行合并，返回是否成功"""
+        """执行合并, 返回是否成功"""
         try:
             # 解析所有输入输出路径为绝对路径
             video_path = Path(video_file).resolve()
@@ -558,17 +556,17 @@ class FFmpegMediaMerger:
             print(f"  输出 : {output_path.name}")
             print(f"{'─' * 60}")
             
-            # ── 第一次尝试：全部 copy ──
+            # ── 第一次尝试 : 全部 copy ──
             cmd = self._build_command(video_path, audio_paths, subtitle_paths, output_path)
             if self.verbose:
                 print(f"\n  [命令] {' '.join(cmd)}\n")
             # 执行命令
             success = self._execute(cmd)
             
-            # ── 第二次尝试：字幕不 copy（降级） ──
-            # 如果第一次失败且存在字幕文件，尝试降级重编码字幕
+            # ── 第二次尝试 : 字幕不 copy（降级） ──
+            # 如果第一次失败且存在字幕文件, 尝试降级重编码字幕
             if not success and subtitle_paths:
-                print("  [重试] 字幕 copy 失败，尝试自动编码字幕...")
+                print("  [重试] 字幕 copy 失败, 尝试自动编码字幕...")
                 cmd2 = self._build_command_with_subtitle_fallback(
                     video_path, audio_paths, subtitle_paths, output_path
                 )
@@ -581,7 +579,7 @@ class FFmpegMediaMerger:
                 size_mb = output_path.stat().st_size / (1024 * 1024)
                 print(f"\n  [成功] {output_path}  ({size_mb:.1f} MB)")
             else:
-                print(f"\n  [失败] 合并未成功，请检查输入文件。")
+                print(f"\n  [失败] 合并未成功, 请检查输入文件.")
             return success
         except Exception as e:
             # 捕获并打印异常堆栈
@@ -590,25 +588,25 @@ class FFmpegMediaMerger:
             traceback.print_exc()
             return False
             
-    # 静态方法：检查文件是否有效
+    # 静态方法 : 检查文件是否有效
     @staticmethod
     def _check_file(path: Path, label: str) -> bool:
-        # 如果文件不存在，打印提示并返回 False
+        # 如果文件不存在, 打印提示并返回 False
         if not path.is_file():
             print(f"  [跳过] {label}文件不存在: {path}")
             return False
         try:
-            # 如果文件为空（0字节），打印提示并返回 False
+            # 如果文件为空（0字节）, 打印提示并返回 False
             if path.stat().st_size == 0:
                 print(f"  [跳过] {label}文件为空: {path}")
                 return False
         except OSError:
-            # 如果无法访问文件，打印提示并返回 False
+            # 如果无法访问文件, 打印提示并返回 False
             print(f"  [跳过] {label}文件不可访问: {path}")
             return False
         return True
         
-    # 静态方法：执行 FFmpeg 命令
+    # 静态方法 : 执行 FFmpeg 命令
     @staticmethod
     def _execute(cmd: List[str]) -> bool:
         """执行 FFmpeg 命令"""
@@ -620,9 +618,9 @@ class FFmpegMediaMerger:
                 stderr=subprocess.PIPE,
                 text=True,
             )
-            # 等待进程结束，设置 1 小时超时
+            # 等待进程结束, 设置 1 小时超时
             _, stderr = process.communicate(timeout=3600)  # 1 小时超时
-            # 如果返回码为 0，表示成功
+            # 如果返回码为 0, 表示成功
             if process.returncode == 0:
                 return True
             # 打印精简的错误信息
@@ -639,13 +637,13 @@ class FFmpegMediaMerger:
                     for el in error_lines[:10]:
                         print(f"    {el.strip()}")
                 else:
-                    # 如果没有匹配的关键错误，打印最后 5 行输出
+                    # 如果没有匹配的关键错误, 打印最后 5 行输出
                     print(f"  [FFmpeg 退出码] {process.returncode}")
                     for l in lines[-5:]:
                         print(f"    {l.strip()}")
             return False
         except subprocess.TimeoutExpired:
-            # 超时处理：强制杀死进程
+            # 超时处理 : 强制杀死进程
             process.kill()
             print("  [超时] FFmpeg 执行超时")
             return False
@@ -655,13 +653,13 @@ class FFmpegMediaMerger:
             
     # ────────────── 交互模式 ──────────────
     
-    # 实例方法：交互式文件选择
+    # 实例方法 : 交互式文件选择
     def interactive(self) -> bool:
         """
-        交互式文件选择。
-        核心改进：通过 ffprobe 检测实际流类型，
-        .webm（纯音频）会出现在音频列表中，
-        不再依赖扩展名分类。
+        交互式文件选择.
+        核心改进 : 通过 ffprobe 检测实际流类型, 
+        .webm（纯音频）会出现在音频列表中, 
+        不再依赖扩展名分类.
         """
         try:
             # 打印交互模式欢迎信息
@@ -700,7 +698,7 @@ class FFmpegMediaMerger:
             # ── 步骤 2: 选择音频 ──
             # 排除已选的视频文件本身
             audio_candidates = [a for a in audio_list if a.path != video_info.path]
-            print(f"  [步骤 2/3] 选择音频文件（共 {len(audio_candidates)} 个，可多选）")
+            print(f"  [步骤 2/3] 选择音频文件（共 {len(audio_candidates)} 个, 可多选）")
             print(f"  {'─' * 50}")
             if audio_candidates:
                 for i, a in enumerate(audio_candidates, 1):
@@ -725,7 +723,7 @@ class FFmpegMediaMerger:
             # ── 步骤 3: 选择字幕 ──
             # 排除已选的视频文件本身
             subtitle_candidates = [s for s in subtitle_list if s.path != video_info.path]
-            print(f"  [步骤 3/3] 选择字幕文件（共 {len(subtitle_candidates)} 个，可多选）")
+            print(f"  [步骤 3/3] 选择字幕文件（共 {len(subtitle_candidates)} 个, 可多选）")
             print(f"  {'─' * 50}")
             if subtitle_candidates:
                 for i, s in enumerate(subtitle_candidates, 1):
@@ -755,7 +753,7 @@ class FFmpegMediaMerger:
             # 等待用户确认
             confirm = input("\n  确认执行？(Y/n): ").strip().lower()
             if confirm == 'n':
-                print("  已取消。")
+                print("  已取消.")
                 return False
                 
             # ── 输出文件名 ──
@@ -777,7 +775,7 @@ class FFmpegMediaMerger:
             )
         except KeyboardInterrupt:
             # 捕获 Ctrl+C 中断
-            print("\n\n  操作已取消。")
+            print("\n\n  操作已取消.")
             return False
         except Exception as e:
             # 捕获其他异常
@@ -786,7 +784,7 @@ class FFmpegMediaMerger:
             traceback.print_exc()
             return False
             
-    # 静态方法：从列表中选择单个文件
+    # 静态方法 : 从列表中选择单个文件
     @staticmethod
     def _pick_one(items: List[StreamInfo], label: str) -> Optional[StreamInfo]:
         """从列表中选一个"""
@@ -800,7 +798,7 @@ class FFmpegMediaMerger:
                 idx = int(raw) - 1
                 if 0 <= idx < len(items):
                     return items[idx]
-                print(f"  编号超出范围，请重试")
+                print(f"  编号超出范围, 请重试")
                 continue
             # 如果是关键字匹配
             keyword = raw.lower()
@@ -808,7 +806,7 @@ class FFmpegMediaMerger:
             if len(matches) == 1:
                 return matches[0]
             elif len(matches) > 1:
-                print(f"  匹配到 {len(matches)} 个文件，请更精确:")
+                print(f"  匹配到 {len(matches)} 个文件, 请更精确:")
                 for m in matches:
                     print(f"    {m.path.name}")
                 continue
@@ -819,12 +817,12 @@ class FFmpegMediaMerger:
                     dummy = StreamInfo(p)
                     dummy.has_video = True
                     return dummy
-                print(f"  未匹配到任何文件，请重试")
+                print(f"  未匹配到任何文件, 请重试")
                 
-    # 静态方法：从列表中多选文件
+    # 静态方法 : 从列表中多选文件
     @staticmethod
     def _pick_multiple(items: List[StreamInfo], label: str) -> List[StreamInfo]:
-        """从列表中多选（逗号/空格分隔），支持 all 关键字"""
+        """从列表中多选（逗号/空格分隔）, 支持 all 关键字"""
         while True:
             raw = input(
                 f"  请输入编号 (逗号分隔, 'all'=全选, 回车=跳过): "
@@ -862,7 +860,7 @@ class FFmpegMediaMerger:
             
     # ────────────── 自动模式 ──────────────
     
-    # 实例方法：自动匹配同名文件并合并
+    # 实例方法 : 自动匹配同名文件并合并
     def auto_merge(self, output_dir: Optional[Union[str, Path]] = None) -> Dict[str, bool]:
         """自动匹配同名文件并合并"""
         results: Dict[str, bool] = {}
@@ -932,7 +930,7 @@ def main():
         # 初始化合并器实例
         merger = FFmpegMediaMerger(args.dir)
         merger.verbose = not args.quiet
-        # 处理 --info 参数：仅显示文件流信息
+        # 处理 --info 参数 : 仅显示文件流信息
         if args.info:
             info = merger.probe_file(Path(args.info).resolve())
             print(f"\n  文件: {info.path.name}")
@@ -946,7 +944,7 @@ def main():
                     cn = s.get('codec_name', '?')
                     print(f"    [{i}] {ct} / {cn}")
             return
-        # 处理手动指定视频参数：直接合并
+        # 处理手动指定视频参数 : 直接合并
         if args.video:
             merger.merge_files(args.video, args.audio, args.subtitle, args.output)
             return
