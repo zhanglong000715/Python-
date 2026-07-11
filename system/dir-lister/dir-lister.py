@@ -1,12 +1,12 @@
-# 导入必要模块
+# 导入 os 模块
 import os
 
-# 定义一个函数用于获取当前文件夹文件：
+# 定义一个函数用于获取当前文件夹文件 : 
 def get_current_folder_files():
 
     """
-    功能：获取当前脚本所在目录下的所有文件以及子文件夹内的所有文件(排除了文件夹)
-    返回值：一个包含脚本所在目录以及此目录下的所有子文件夹目录的列表(排除了文件夹)
+    功能 : 获取当前脚本所在目录下的所有文件以及子文件夹内的所有文件(排除了文件夹)
+    返回值 : 一个包含脚本所在目录以及此目录下的所有子文件夹目录的列表(排除了文件夹)
     """
 
     # 获取脚本当前位置的绝对路径
@@ -40,16 +40,16 @@ def get_current_folder_files():
 def write_to_txt(items):
 
     """
-    功能：将传入的文件名称写入到 txt 文件中
-    参数：items - 包含文件名称的列表(排除了文件夹)
-    返回值：生成的 txt 文件的绝对路径
+    功能 : 将传入的文件名称写入到 txt 文件中
+    参数 : items - 包含文件名称的列表(排除了文件夹)
+    返回值 : 生成的 txt 文件的绝对路径
     """
 
     # 定义输出文件的名称
     output_filename = "test_文件列表.txt"
 
-    # os.getcwd() 获取当前工作目录（Current Working Directory）
-    # os.path.join() 将目录和文件名安全地拼接成完整路径，自动处理不同操作系统的路径分隔符（如Windows的\和Linux的/）
+    # os.getcwd() 获取当前工作目录(Current Working Directory)
+    # os.path.join() 将目录和文件名安全地拼接成完整路径，自动处理不同操作系统的路径分隔符(如Windows的\和Linux的/)
     file_path = os.path.join(os.getcwd(), output_filename)
 
     # 使用 with 语句打开文件,确保文件操作完成后会自动关闭,使用w写入模式防止多次运行导致报错,w模式可覆盖原文件
@@ -88,7 +88,7 @@ def write_to_txt(items):
 def main():
 
     """
-    功能：脚本的主控制流程，协调各个函数并输出控制台提示
+    功能 : 脚本的主控制流程，协调各个函数并输出控制台提示
     """
     # print语句打印脚本运行状态
     print("请等待")
@@ -125,4 +125,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
