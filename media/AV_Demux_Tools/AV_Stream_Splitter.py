@@ -572,9 +572,12 @@ def main():
             created = process_file(path) or []
             # 将本次创建的文件路径追加到汇总列表
             all_created.extend(created)
+        except UnicodeDecodeError as e:
+            # 捕获文件读取时的Unicode 解码异常(如 GBK 编码不兼容等)记录警告信息后跳过当前文件, 继续处理后续文件.
+            print('\033[33m请忽略这个异常,\033[0m 处理 {} 时出现编码解析异常, 这并不影响FFmpeg的封装.'.format(fn))
         except Exception as e:
             # 如果处理过程中发生未预期的异常, 捕获并打印错误信息, 继续处理下一个文件
-            print('处理 {} 时异常: {}'.format(fn, e))
+            print('处理 {} 时\033[91m异常:\033[0m {}'.format(fn, e))
     # 所有文件处理完毕后, 打印分隔线和汇总标题
     print('\n全部处理完成.生成文件:')
     # 遍历所有成功创建的文件, 打印其文件名
