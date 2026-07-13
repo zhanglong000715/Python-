@@ -76,25 +76,25 @@ SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 # 用于判断一个文件的扩展名是否属于本脚本可处理的媒体格式
 
 KNOWN_FORMATS = {
-    # 常见视频容器格式 | Common video container formats / 一般的なビデオコンテナフォーマット
+    # 常见视频容器格式
     'mp4','mkv','avi','mov','flv','wmv','mpg','mpeg','mts','m2ts','ts','vob','rm','rmvb','asf',
     
-    # 移动端及其他视频格式 | Mobile and other video formats / モバイルおよびその他のビデオフォーマット
+    # 移动端及其他视频格式
     '3gp','3g2','divx','f4v','ogv','dv',
     
-    # Web媒体格式 | Web media formats / Webメディアフォーマット
+    # Web媒体格式
     'webm','ogg','ogx','m4v',
     
-    # 常见音频格式 | Common audio formats / 一般的なオーディオフォーマット
+    # 常见音频格式
     'mp3','wav','aac','m4a','flac','oga','opus','wma','ac3','dts','eac3','mka','aiff','aif',
     
-    # 无损/有损压缩音频及有声书等格式 | Lossless/lossy compressed audio and audiobook formats / 可逆・非可逆圧縮オーディオおよびオーディオブックフォーマット
+    # 无损/有损压缩音频及有声书等格式
     'm4b','ape','tta','mp2','amr','mpc','wv','spx','ra','ram','caf',
     
-    # 裸视频编码流格式 | Raw video codec stream formats / 裸のビデオコーデックストリームフォーマット
+    # 裸视频编码流格式
     'h264','h265','hevc','avc','vp9','ivf',
     
-    # 常见字幕文件格式 | Common subtitle file formats / 一般的な字幕ファイルフォーマット
+    # 常见字幕文件格式
     'srt','ass','ssa','sub','idx','vtt','ttml','dfxp','smi','sami','mpl','pjs','stl','sup','pgs','sbv','lrc','rt','txt'
 }
 
@@ -102,32 +102,32 @@ KNOWN_FORMATS = {
 # 当从容器中提取音轨时, 根据编码类型决定保存为什么格式的文件
 
 AUDIO_CODEC_TO_EXT = {
-    'flac': '.flac',                                          # FLAC无损音频 -> .flac文件 | FLAC lossless audio -> .flac file / FLAC可逆圧縮オーディオ -> .flacファイル
-    'mp3': '.mp3',                                            # MP3有损音频 -> .mp3文件 | MP3 lossy audio -> .mp3 file / MP3非可逆圧縮オーディオ -> .mp3ファイル
-    'aac': '.m4a',                                            # AAC音频 -> .m4a文件 | AAC audio -> .m4a file / AACオーディオ -> .m4aファイル
-    'adts': '.m4a',                                           # ADTS格式的AAC音频 -> .m4a文件 | ADTS-framed AAC audio -> .m4a file / ADTSフレームAACオーディオ -> .m4aファイル
-    'aac_latm': '.m4a',                                       # LATM传输格式的AAC音频 -> .m4a文件 | LATM transport AAC audio -> .m4a file / LATMトランスポートAACオーディオ -> .m4aファイル
-    'opus': '.ogg',                                           # Opus音频 -> .ogg文件 | Opus audio -> .ogg file / Opusオーディオ -> .oggファイル
-    'vorbis': '.ogg',                                          # Vorbis音频 -> .ogg文件 | Vorbis audio -> .ogg file / Vorbisオーディオ -> .oggファイル
-    'pcm_s16le': '.wav', 'pcm_s24le': '.wav',                 # PCM 16位/24位有符号小端 -> .wav文件 | PCM 16/24-bit signed little-endian -> .wav file / PCM 16/24ビット符号付きリトルエンディアン -> .wavファイル
-    'pcm_u8': '.wav', 'pcm_s16be': '.wav',                    # PCM 8位无符号/16位大端 -> .wav文件 | PCM 8-bit unsigned / 16-bit big-endian -> .wav file / PCM 8ビット符号なし・16ビットビッグエンディアン -> .wavファイル
-    'alac': '.m4a',                                           # Apple无损音频 -> .m4a文件 | Apple Lossless audio -> .m4a file / Apple可逆圧縮オーディオ -> .m4aファイル
-    'ac3': '.ac3', 'eac3': '.eac3', 'dts': '.dts',           # AC3/EAC3/DTS环绕声音频 -> 对应扩展名 | AC3/EAC3/DTS surround audio -> corresponding extensions / AC3/EAC3/DTSサラウンドオーディオ -> 対応する拡張子
-    'wavpack': '.wv', 'tta': '.tta', 'ape': '.ape',          # WavPack/TTA/APE无损音频 -> 对应扩展名 | WavPack/TTA/APE lossless audio -> corresponding extensions / WavPack/TTA/APE可逆圧縮オーディオ -> 対応する拡張子
-    'mp2': '.mp2', 'amr': '.amr', 'wma': '.wma'              # MP2/AMR/WMA音频 -> 对应扩展名 | MP2/AMR/WMA audio -> corresponding extensions / MP2/AMR/WMAオーディオ -> 対応する拡張子
+    'flac': '.flac',                                          # FLAC无损音频 -> .flac文件
+    'mp3': '.mp3',                                            # MP3有损音频 -> .mp3文件
+    'aac': '.m4a',                                            # AAC音频 -> .m4a文件
+    'adts': '.m4a',                                           # ADTS格式的AAC音频 -> .m4a文件
+    'aac_latm': '.m4a',                                       # LATM传输格式的AAC音频 -> .m4a文件
+    'opus': '.ogg',                                           # Opus音频 -> .ogg文件
+    'vorbis': '.ogg',                                          # Vorbis音频 -> .ogg文件
+    'pcm_s16le': '.wav', 'pcm_s24le': '.wav',                 # PCM 16位/24位有符号小端 -> .wav文件
+    'pcm_u8': '.wav', 'pcm_s16be': '.wav',                    # PCM 8位无符号/16位大端 -> .wav文件
+    'alac': '.m4a',                                           # Apple无损音频 -> .m4a文件
+    'ac3': '.ac3', 'eac3': '.eac3', 'dts': '.dts',           # AC3/EAC3/DTS环绕声音频 -> 对应扩展名
+    'wavpack': '.wv', 'tta': '.tta', 'ape': '.ape',          # WavPack/TTA/APE无损音频 -> 对应扩展名
+    'mp2': '.mp2', 'amr': '.amr', 'wma': '.wma'              # MP2/AMR/WMA音频 -> 对应扩展名
 }
 
 # 字幕编解码器名称到推荐输出文件扩展名的映射字典
 # 当从容器中提取字幕流时, 根据编码类型决定保存为什么格式的文件
 
 SUB_CODEC_TO_EXT = {
-    'subrip': '.srt', 'srt': '.srt',                          # SubRip字幕 -> .srt文件 | SubRip subtitles -> .srt file / SubRip字幕 -> .srtファイル
-    'ass': '.ass', 'ssa': '.ass',                             # ASS/SSA高级字幕 -> .ass文件 | ASS/SSA advanced subtitles -> .ass file / ASS/SSA高度な字幕 -> .assファイル
-    'webvtt': '.vtt', 'vtt': '.vtt',                          # WebVTT网页字幕 -> .vtt文件 | WebVTT web subtitles -> .vtt file / WebVTTウェブ字幕 -> .vttファイル
-    'hdmv_pgs_subtitle': '.sup', 'pgs': '.sup',               # 蓝光PGS图形字幕 -> .sup文件 | Blu-ray PGS graphic subtitles -> .sup file / Blu-ray PGSグラフィック字幕 -> .supファイル
-    'dvd_subtitle': '.sub',                                    # DVD VobSub字幕 -> .sub文件 | DVD VobSub subtitles -> .sub file / DVD VobSub字幕 -> .subファイル
-    'mov_text': '.txt',                                        # QuickTime/MOV文本字幕 -> .txt文件 | QuickTime/MOV text subtitles -> .txt file / QuickTime/MOVテキスト字幕 -> .txtファイル
-    'xsub': '.sub'                                             # XSUB字幕(DivX) -> .sub文件 | XSUB subtitles (DivX) -> .sub file / XSUB字幕(DivX) -> .subファイル
+    'subrip': '.srt', 'srt': '.srt',                          # SubRip字幕 -> .srt文件
+    'ass': '.ass', 'ssa': '.ass',                             # ASS/SSA高级字幕 -> .ass文件
+    'webvtt': '.vtt', 'vtt': '.vtt',                          # WebVTT网页字幕 -> .vtt文件
+    'hdmv_pgs_subtitle': '.sup', 'pgs': '.sup',               # 蓝光PGS图形字幕 -> .sup文件
+    'dvd_subtitle': '.sub',                                    # DVD VobSub字幕 -> .sub文件
+    'mov_text': '.txt',                                        # QuickTime/MOV文本字幕 -> .txt文件
+    'xsub': '.sub'                                             # XSUB字幕(DivX) -> .sub文件
 }
 
 # 定义支持内嵌字幕流的容器格式集合
