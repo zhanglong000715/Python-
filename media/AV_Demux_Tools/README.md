@@ -206,13 +206,13 @@ Consider a file named `Movie.mkv` with the following structure:
 
 ---
 
-## 📄 License
+## 📄 许可证 / ライセンス / License
 
-This project is open-source and available for personal and educational use. Please respect the intellectual property rights of the media content you process.
+**中文：** 欢迎自由使用、修改和分发！
 
-## 🤝 Contributing
+**日本語：** 自由に使用、改変、配布してください！
 
-Feel free to report issues or submit pull requests if you have improvements or bug fixes.
+**English:** MIT License - Feel free to use, modify, and distribute!
 
 ---
 
