@@ -237,11 +237,11 @@ python MKV_Fuse.py -I somefile.mkv
 
 ## 📄 许可证 / ライセンス / License
 
-**中文：** 本项目以个人名义发布，自由使用，欢迎 Star ⭐
+**中文：** MIT License - Feel free to use, modify, and distribute!
 
-**日本語：** 本プロジェクトは個人名義で公開されており、自由に使用できます。Star ⭐ 歓迎！
+**日本語：** 自由に使用、改変、配布してください！
 
-**English:** This project is published under a personal name and is free to use. Stars ⭐ are welcome!
+**English:** 欢迎自由使用、修改和分发！
 
 ---
 
