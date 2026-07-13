@@ -5,7 +5,7 @@ A collection of useful tools organized by folders. Each folder contain
 
 ---
 
-## ✨ Table of Contents (目录)
+## ✨ Table of Contents (目录)
 - **[Folder Name 1 / 文件夹名称1]**: [What it does / 用途说明]
 - **[Folder Name 2 / 文件夹名称2]**: [What it does / 用途说明]
 - **[Folder Name 3 / 文件夹名称3]**: [What it does / 用途说明]
